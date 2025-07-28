@@ -1,0 +1,60 @@
+// Place your settings in this file to overwrite default and user settings.
+{
+    "files.exclude": {
+        "out": false, // set this to true to hide the "out" folder with the compiled JS files
+        "dist": false // set this to true to hide the "dist" folder with the compiled JS files
+    },
+    "search.exclude": {
+        "out": true, // set this to false to include "out" folder in search results
+        "dist": true // set this to false to include "dist" folder in search results
+    },
+    // Turn off tsc task auto detection since we have the necessary tasks as npm scripts
+    "typescript.tsc.autoDetect": "off",
+    "editor.formatOnType": true,
+    "editor.formatOnSave": true,
+
+    "editor.codeActionsOnSave": {
+        "source.fixAll.eslint": "explicit",
+        "source.fixAll.stylelint": "explicit"
+    },
+    "peacock.color": "#48cdd4",
+    "workbench.colorCustomizations": {
+        "activityBar.activeBackground": "#71d8de",
+        "activityBar.background": "#71d8de",
+        "activityBar.foreground": "#15202b",
+        "activityBar.inactiveForeground": "#15202b99",
+        "activityBarBadge.background": "#d54acd",
+        "activityBarBadge.foreground": "#15202b",
+        "commandCenter.border": "#15202b99",
+        "sash.hoverBorder": "#71d8de",
+        "statusBar.background": "#48cdd4",
+        "statusBar.foreground": "#15202b",
+        "statusBarItem.hoverBackground": "#2cb5bd",
+        "statusBarItem.remoteBackground": "#48cdd4",
+        "statusBarItem.remoteForeground": "#15202b",
+        "titleBar.activeBackground": "#48cdd4",
+        "titleBar.activeForeground": "#15202b",
+        "titleBar.inactiveBackground": "#48cdd499",
+        "titleBar.inactiveForeground": "#15202b99"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[vue]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "[less]": {
+        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    },
+    "prettier.printWidth": 120,
+    "prettier.tabWidth": 4
+}

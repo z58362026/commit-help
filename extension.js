@@ -1,36 +1,49 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
-const vscode = require('vscode');
-
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
+const vscode = require("vscode");
+// 引入各个功能模块
+const { createVisualList } = require("./src/features/visualList");
+const { submitCommit } = require("./src/features/commitSubmit");
+const { copyToClipboard } = require("./src/features/clipboardCopy");
+const { setupAutocomplete } = require("./src/features/terminalAutocomplete");
+const { registerKeyboardShortcut } = require("./src/triggers/keyboardShortcut");
+const { createButtonTrigger } = require("./src/triggers/buttonTrigger");
+const { registerGitCommitTrigger } = require("./src/triggers/gitCommitTrigger");
 
 /**
+ * 扩展激活时调用
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+    // 扩展激活时输出日志
+    console.log('Congratulations, your extension "commit-helper" is now active!');
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "wangming" is now active!');
+    // 注册可视化列表命令
+    const visualListCommand = vscode.commands.registerCommand("commit-helper.showVisualList", createVisualList);
+    // 注册自动提交命令
+    const submitCommitCommand = vscode.commands.registerCommand("commit-helper.submitCommit", submitCommit);
+    // 注册复制到剪切板命令
+    const copyToClipboardCommand = vscode.commands.registerCommand("commit-helper.copyToClipboard", copyToClipboard);
 
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with  registerCommand
-	// The commandId parameter must match the command field in package.json
-	const disposable = vscode.commands.registerCommand('wangming.helloWorld', function () {
-		// The code you place here will be executed every time your command is executed
+    // 将命令加入订阅，确保扩展卸载时自动清理
+    context.subscriptions.push(visualListCommand);
+    context.subscriptions.push(submitCommitCommand);
+    context.subscriptions.push(copyToClipboardCommand);
 
-		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from commit-helper!');
-	});
-
-	context.subscriptions.push(disposable);
+    // 注册快捷键触发
+    registerKeyboardShortcut(context);
+    // 注册按钮触发
+    createButtonTrigger(context);
+    // 注册 git commit 触发
+    registerGitCommitTrigger(context);
 }
 
-// This method is called when your extension is deactivated
+/**
+ * 扩展卸载时调用
+ */
 function deactivate() {}
 
 module.exports = {
-	activate,
-	deactivate
-}
+    activate,
+    deactivate,
+};
