@@ -17,6 +17,8 @@
         "source.fixAll.eslint": "explicit",
         "source.fixAll.stylelint": "explicit"
     },
+    "eslint.enable": false,
+    "javascript.validate.enable": false,
     "peacock.color": "#48cdd4",
     "workbench.colorCustomizations": {
         "activityBar.activeBackground": "#71d8de",
@@ -46,9 +48,9 @@
     "[typescript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
-    "[javascript]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
+    // "[javascript]": {
+    //     "editor.defaultFormatter": "esbenp.prettier-vscode"
+    // },
     "[vue]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },

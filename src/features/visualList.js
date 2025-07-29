@@ -4,8 +4,9 @@ const { formatRequirement, formatBug } = require("../zenTao/utils");
 
 /**
  * 创建禅道需求和 Bug 的可视化列表
+ * @param {vscode.ExtensionContext} context
  */
-function createVisualList() {
+function createVisualList(context) {
     // 创建 Webview 面板用于展示需求和 Bug
     const panel = vscode.window.createWebviewPanel(
         "zenTaoVisualList",
@@ -16,14 +17,13 @@ function createVisualList() {
 
     panel.webview.html = getWebviewContent();
 
-    // 异步获取需求列表并发送到 Webview
-    fetchRequirements().then((requirements) => {
+    // 传递 context 给 fetchRequirements 和 fetchBugs
+    fetchRequirements(context).then((requirements) => {
         const formattedRequirements = requirements.map((req) => formatRequirement(req));
         panel.webview.postMessage({ type: "requirements", data: formattedRequirements });
     });
 
-    // 异步获取 Bug 列表并发送到 Webview
-    fetchBugs().then((bugs) => {
+    fetchBugs(context).then((bugs) => {
         const formattedBugs = bugs.map((bug) => formatBug(bug));
         panel.webview.postMessage({ type: "bugs", data: formattedBugs });
     });
@@ -41,7 +41,7 @@ function createVisualList() {
             }
         },
         undefined,
-        context.subscriptions
+        context ? context.subscriptions : undefined
     );
 }
 
