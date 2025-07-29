@@ -2,42 +2,43 @@ const axios = require("axios");
 const vscode = require("vscode");
 
 // 禅道 API 地址
-const ZENTAO_API_URL = "https://rizentao.gientech.com/api.php/v1/";
+const ZENTAO_API_URL = "https://rizentao.gientech.com/api.php/v1";
 
 // 获取 token 的 key
 const TOKEN_KEY = "zentao_token";
 
 /**
- * 获取本地保存的 token
+ * 获取本地保存的 token（存储到工作区）
  */
 function getToken(context) {
-    return context.globalState.get(TOKEN_KEY, "");
+    return context.workspaceState.get(TOKEN_KEY, "");
 }
 
 /**
- * 保存 token 到本地
+ * 保存 token 到本地（存储到工作区）
  */
 function saveToken(context, token) {
-    context.globalState.update(TOKEN_KEY, token);
+    context.workspaceState.update(TOKEN_KEY, token);
 }
 
 /**
  * 弹窗让用户输入账号和密码，并获取 token
  */
 async function promptForToken(context) {
-    // const username = await vscode.window.showInputBox({
-    //     prompt: "请输入禅道账号",
-    //     ignoreFocusOut: true,
-    // });
-    const username = 'P6080583'
+    // const username = 'P6080583'
+    // const password = '!@#EFV5210ww'
+    const username = await vscode.window.showInputBox({
+        prompt: "请输入禅道账号",
+        ignoreFocusOut: true,
+
+    });
     if (!username) return "";
 
-    // const password = await vscode.window.showInputBox({
-    //     prompt: "请输入禅道密码",
-    //     password: true,
-    //     ignoreFocusOut: true,
-    // });
-    const password = '!@#EFV5210ww'
+    const password = await vscode.window.showInputBox({
+        prompt: "请输入禅道密码",
+        password: true,
+        ignoreFocusOut: true,
+    });
     if (!password) return "";
 
     try {
@@ -50,11 +51,9 @@ async function promptForToken(context) {
             },
             {
                 headers: {
-                    'Accept': 'application/json',
                     "Content-Type": "application/json"
 
                 },
-                withCredentials: true
             }
         );
         const token = res.data && res.data.token;
@@ -91,9 +90,10 @@ async function fetchRequirements(context) {
     if (!token) return [];
     try {
         const response = await axios.get(`${ZENTAO_API_URL}/projects/1658/stories`, {
-            headers: { "Token": token }
+
+            headers: { "Token": 'bd26or1ifr20vh0al5hiv7pyc64trvnz' }
         });
-        return response.data;
+        return response.data.stories || [];
     } catch (error) {
         console.error("获取需求列表失败:", error);
         throw error;
@@ -110,7 +110,7 @@ async function fetchBugs(context) {
         const response = await axios.get(`${ZENTAO_API_URL}/products/399/bugs`, {
             headers: { "Token": token }
         });
-        return response.data;
+        return response.data.bugs || [];
     } catch (error) {
         console.error("获取 Bug 列表失败:", error);
         throw error;

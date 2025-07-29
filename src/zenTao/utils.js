@@ -11,7 +11,7 @@ function formatRequirement(requirement) {
  * 格式化 Bug
  */
 function formatBug(bug) {
-    return `${bug.id}: ${bug.description}`;
+    return `${bug.id}: ${bug.title}`;
 }
 
 /**

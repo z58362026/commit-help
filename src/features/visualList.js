@@ -55,29 +55,42 @@ function getWebviewContent() {
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>ZenTao Visual List</title>
+        <style>
+            .section-title { font-weight: bold; margin-top: 16px; }
+            ul { padding-left: 20px; }
+            li { margin: 4px 0; }
+        </style>
     </head>
     <body>
-        <h1>ZenTao Requirements and Bugs</h1>
-        <div id="requirements"></div>
-        <div id="bugs"></div>
+        <h1>ZenTao 可视化需求与 Bug 列表</h1>
+        <div>
+            <div class="section-title">需求列表</div>
+            <ul id="requirements"></ul>
+        </div>
+        <div>
+            <div class="section-title">Bug 列表</div>
+            <ul id="bugs"></ul>
+        </div>
         <script>
             const vscode = acquireVsCodeApi();
 
             window.addEventListener('message', event => {
                 const message = event.data;
                 if (message.type === 'requirements') {
-                    const requirementsDiv = document.getElementById('requirements');
+                    const requirementsUl = document.getElementById('requirements');
+                    requirementsUl.innerHTML = '';
                     message.data.forEach(req => {
-                        const reqElement = document.createElement('div');
-                        reqElement.textContent = req;
-                        requirementsDiv.appendChild(reqElement);
+                        const li = document.createElement('li');
+                        li.textContent = req;
+                        requirementsUl.appendChild(li);
                     });
                 } else if (message.type === 'bugs') {
-                    const bugsDiv = document.getElementById('bugs');
+                    const bugsUl = document.getElementById('bugs');
+                    bugsUl.innerHTML = '';
                     message.data.forEach(bug => {
-                        const bugElement = document.createElement('div');
-                        bugElement.textContent = bug;
-                        bugsDiv.appendChild(bugElement);
+                        const li = document.createElement('li');
+                        li.textContent = bug;
+                        bugsUl.appendChild(li);
                     });
                 }
             });
