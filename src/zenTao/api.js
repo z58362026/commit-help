@@ -91,7 +91,7 @@ async function fetchRequirements(context) {
     try {
         const response = await axios.get(`${ZENTAO_API_URL}/projects/1658/stories`, {
 
-            headers: { "Token": 'bd26or1ifr20vh0al5hiv7pyc64trvnz' }
+            headers: { "Token": token }
         });
         return response.data.stories || [];
     } catch (error) {
