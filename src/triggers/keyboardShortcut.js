@@ -14,7 +14,7 @@ function registerKeyboardShortcut(context) {
 
     // 设置快捷键（可在 package.json 里配置更好）
     const keybinding = {
-        key: "ctrl+alt+z", // 可自定义快捷键
+        key: "ctrl+alt+c", // 可自定义快捷键
         command: "commit-helper.openVisualList",
         when: "editorTextFocus",
     };

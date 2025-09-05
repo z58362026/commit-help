@@ -1,12 +1,18 @@
 const vscode = require("vscode");
 const { fetchRequirements, fetchBugs } = require("../zenTao/api");
 const { formatRequirement, formatBug } = require("../zenTao/utils");
+const { ensureToken } = require("../zenTao/api");
 
 /**
  * 创建禅道需求和 Bug 的可视化列表
  * @param {vscode.ExtensionContext} context
  */
-function createVisualList(context) {
+async function createVisualList(context) {
+    const token = await ensureToken(context);
+    if (!token) {
+        vscode.window.showErrorMessage("无法获取禅道 token，无法显示需求和 Bug 列表。");
+        return;
+    }
     // 创建 Webview 面板用于展示需求和 Bug
     const panel = vscode.window.createWebviewPanel(
         "zenTaoVisualList",
@@ -18,12 +24,12 @@ function createVisualList(context) {
     panel.webview.html = getWebviewContent();
 
     // 传递 context 给 fetchRequirements 和 fetchBugs
-    fetchRequirements(context).then((requirements) => {
+    fetchRequirements(token).then((requirements) => {
         const formattedRequirements = requirements.map((req) => formatRequirement(req));
         panel.webview.postMessage({ type: "requirements", data: formattedRequirements });
     });
 
-    fetchBugs(context).then((bugs) => {
+    fetchBugs(token).then((bugs) => {
         const formattedBugs = bugs.map((bug) => formatBug(bug));
         panel.webview.postMessage({ type: "bugs", data: formattedBugs });
     });

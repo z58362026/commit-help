@@ -28,7 +28,25 @@
                 "command": "commit-helper.copyToClipboard",
                 "title": "Copy ZenTao Info to Clipboard"
             }
-        ]
+        ],
+        "keybindings": [
+            {
+                "command": "commit-helper.showVisualList",
+                "key": "ctrl+alt+c",
+                "mac": "cmd+alt+c",
+                "when": "config.commit-helper.enableHelloShortcut"
+            }
+        ],
+        "configuration": {
+            "title": "commit-helper",
+            "properties": {
+                "commit-helper.enableHelloShortcut": {
+                    "type": "boolean",
+                    "default": true,
+                    "description": "Enable Ctrl+Alt+C to trigger show visual list."
+                }
+            }
+        }
     },
     "scripts": {
         "lint": "eslint .",

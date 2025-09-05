@@ -24,7 +24,9 @@ function activate(context) {
         vscode.window.showInformationMessage("Hello World VS from commit-helper!");
     });
     // 注册可视化列表命令，传递 context
-    const visualListCommand = vscode.commands.registerCommand("commit-helper.showVisualList", () => createVisualList(context));
+    const visualListCommand = vscode.commands.registerCommand("commit-helper.showVisualList", () =>
+        createVisualList(context)
+    );
     // 注册自动提交命令
     const submitCommitCommand = vscode.commands.registerCommand("commit-helper.submitCommit", submitCommit);
     // 注册复制到剪切板命令
@@ -47,7 +49,7 @@ function activate(context) {
 /**
  * 扩展卸载时调用
  */
-function deactivate() { }
+function deactivate() {}
 
 module.exports = {
     activate,
