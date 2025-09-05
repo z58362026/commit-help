@@ -1,18 +1,43 @@
 const vscode = require("vscode");
-const { fetchRequirements, fetchBugs } = require("../zenTao/api");
+const { fetchRequirements, fetchBugs, ensureToken, fetchProducts, fetchProjects } = require("../zenTao/api");
 const { formatRequirement, formatBug } = require("../zenTao/utils");
-const { ensureToken } = require("../zenTao/api");
+const { getProjects, saveProjects, getProducts, saveProducts } = require("../store/index");
+
+async function fetchProductsAndProjects(params) {
+    const { context, token } = params;
+    const reqArr = [fetchProducts({ context, token }), fetchProjects({ context, token })];
+
+    try {
+        const [products, projects] = await Promise.all(reqArr);
+        return { products, projects };
+    } catch (error) {
+        console.error("获取产品和项目列表失败:", error);
+        return false;
+    }
+}
 
 /**
  * 创建禅道需求和 Bug 的可视化列表
  * @param {vscode.ExtensionContext} context
  */
 async function createVisualList(context) {
+    // 1, 确保有有效的 token
     const token = await ensureToken(context);
     if (!token) {
         vscode.window.showErrorMessage("无法获取禅道 token，无法显示需求和 Bug 列表。");
         return;
     }
+    // 2, 获取产品和项目列表
+    const projects = getProjects(context);
+    const products = getProducts(context);
+    if (!projects?.curId && !products?.curId) {
+        // 不存在或没选择产品项目的情况下，重新获取
+        const result = await fetchProductsAndProjects({ context, token });
+        if (!result) {
+            return;
+        }
+    }
+
     // 创建 Webview 面板用于展示需求和 Bug
     const panel = vscode.window.createWebviewPanel(
         "zenTaoVisualList",

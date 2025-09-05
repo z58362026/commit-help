@@ -1,26 +1,10 @@
 const axios = require("axios");
 const vscode = require("vscode");
 const { showLoginForm } = require("../ui/loginForm");
+const { getToken, saveToken, saveProducts, saveProjects } = require("../store");
 
 // 禅道 API 地址
 const ZENTAO_API_URL = "https://rizentao.gientech.com/api.php/v1";
-
-// 获取 token 的 key
-const TOKEN_KEY = "zentao_token";
-
-/**
- * 获取本地保存的 token（存储到工作区）
- */
-function getToken(context) {
-    return context.workspaceState.get(TOKEN_KEY, "");
-}
-
-/**
- * 保存 token 到本地（存储到工作区）
- */
-function saveToken(context, token) {
-    context.workspaceState.update(TOKEN_KEY, token);
-}
 
 /**
  * 弹窗让用户输入账号和密码，并获取 token
@@ -81,8 +65,9 @@ async function promptForToken(context) {
  */
 async function ensureToken(context) {
     let token = getToken(context);
+    // token 存在时验证其有效性
     const validToken = await fetchUserInfo(token);
-    if (!token || !isValidToken) {
+    if (!token || !validToken) {
         console.log("没有找到 token，弹窗登录获取...");
         token = await promptForToken(context);
     }
@@ -93,7 +78,7 @@ async function ensureToken(context) {
 /**
  * 获取个人信息，用于校验token是否有效
  */
-async function fetchUserInfo(token) { 
+async function fetchUserInfo(token) {
     if (!token) return null;
     try {
         const response = await axios.get(`${ZENTAO_API_URL}/user`, {
@@ -102,15 +87,13 @@ async function fetchUserInfo(token) {
         console.log("获取用户信息成功:", response.data);
         return response.data;
     } catch (error) {
-        debugger
-        if(error.response && error.response.status === 401) {
+        if (error.response && error.response.status === 401) {
             console.error("Token 无效或已过期:", error);
             return null;
         }
         throw error;
     }
 }
- */
 
 /**
  * 获取需求列表
@@ -118,7 +101,7 @@ async function fetchUserInfo(token) {
 async function fetchRequirements(token) {
     if (!token) return [];
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/projects/1658/stories`, {
+        const response = await axios.get(`${ZENTAO_API_URL}/projects/1658/stories?limit=9999&page=1`, {
             headers: { Token: token },
         });
         console.log("获取需求列表成功:", response.data);
@@ -135,7 +118,7 @@ async function fetchRequirements(token) {
 async function fetchBugs(token) {
     if (!token) return [];
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/products/399/bugs`, {
+        const response = await axios.get(`${ZENTAO_API_URL}/products/399/bugs?limit=9999&page=1`, {
             headers: { Token: token },
         });
         console.log("获取 Bug 列表成功:", response.data);
@@ -146,8 +129,77 @@ async function fetchBugs(token) {
     }
 }
 
+/**
+ * 获取 项目 列表
+ * {
+ *  id: number,
+ *  name: string,
+ *  status: string    项目状态(wait 未开始 | doing 进行中 | suspend 已挂起 | closed 已关闭)
+ *  team: string
+ * }
+ */
+async function fetchProjects({ context, token }) {
+    if (!token) return [];
+    try {
+        const response = await axios.get(`${ZENTAO_API_URL}/projects?limit=9999&page=1`, {
+            headers: { Token: token },
+        });
+        const projects = response.data.projects || [];
+
+        // 只保存未关闭的项目
+        const saveInfo = projects.reduce((pre, item) => {
+            const { id, name, status } = item;
+            if (["wait", "doing"].includes(status)) {
+                pre.push({ id, name, status });
+            }
+            return pre;
+        }, []);
+
+        console.log("获取 项目 列表成功:", saveInfo);
+        saveProjects(context, { list: saveInfo });
+        return saveInfo;
+    } catch (error) {
+        console.error("获取 项目 列表失败:", error);
+        throw error;
+    }
+}
+
+/**
+ * 获取 产品 列表
+ * {
+ *  id: number,
+ *  name: string,
+ * }
+ */
+async function fetchProducts({ context, token }) {
+    if (!token) return [];
+    try {
+        const response = await axios.get(`${ZENTAO_API_URL}/products?limit=9999&page=1`, {
+            headers: { Token: token },
+        });
+
+        const products = response.data.products || [];
+        const saveInfo = products.map((item) => {
+            const { id, name } = item;
+            return {
+                id,
+                name,
+            };
+        });
+
+        console.log("获取 产品 列表成功:", saveInfo);
+        saveProducts(context, { list: saveInfo });
+        return saveInfo;
+    } catch (error) {
+        console.error("获取 产品 列表失败:", error);
+        throw error;
+    }
+}
+
 module.exports = {
     fetchRequirements,
     fetchBugs,
     ensureToken,
+    fetchProjects,
+    fetchProducts,
 };
