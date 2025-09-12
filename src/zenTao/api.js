@@ -1,7 +1,7 @@
 const axios = require("axios");
 const vscode = require("vscode");
 const { showLoginForm } = require("../ui/loginForm");
-const { getToken, saveToken, saveProducts, saveProjects } = require("../store");
+const { getToken, saveToken, saveProducts, saveProjects, getProducts, getProjects } = require("../store");
 
 // 禅道 API 地址
 const ZENTAO_API_URL = "https://rizentao.gientech.com/api.php/v1";
@@ -10,8 +10,6 @@ const ZENTAO_API_URL = "https://rizentao.gientech.com/api.php/v1";
  * 弹窗让用户输入账号和密码，并获取 token
  */
 async function promptForToken(context) {
-    // const username = 'P6080583'
-    // const password = '!@#EFV5210ww'
     // 禅道账号密码，工号/默认密码 Password@123
     console.log("开始收集用户信息...");
 
@@ -98,13 +96,13 @@ async function fetchUserInfo(token) {
 /**
  * 获取需求列表
  */
-async function fetchRequirements(token) {
+async function fetchRequirements(token, id) {
     if (!token) return [];
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/projects/1658/stories?limit=9999&page=1`, {
+        const response = await axios.get(`${ZENTAO_API_URL}/projects/${id}/stories?limit=9999&page=1`, {
             headers: { Token: token },
         });
-        console.log("获取需求列表成功:", response.data);
+        console.log("获取需求列表成功:", response);
         return response.data.stories || [];
     } catch (error) {
         console.error("获取需求列表失败:", error);
@@ -115,10 +113,10 @@ async function fetchRequirements(token) {
 /**
  * 获取 Bug 列表
  */
-async function fetchBugs(token) {
+async function fetchBugs(token, id) {
     if (!token) return [];
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/products/399/bugs?limit=9999&page=1`, {
+        const response = await axios.get(`${ZENTAO_API_URL}/products/${id}/bugs?limit=9999&page=1`, {
             headers: { Token: token },
         });
         console.log("获取 Bug 列表成功:", response.data);
@@ -156,7 +154,8 @@ async function fetchProjects({ context, token }) {
         }, []);
 
         console.log("获取 项目 列表成功:", saveInfo);
-        saveProjects(context, { list: saveInfo });
+        const originProjects = getProjects(context);
+        saveProjects(context, { list: saveInfo || [], curId: originProjects?.curId || "" });
         return saveInfo;
     } catch (error) {
         console.error("获取 项目 列表失败:", error);
@@ -188,7 +187,8 @@ async function fetchProducts({ context, token }) {
         });
 
         console.log("获取 产品 列表成功:", saveInfo);
-        saveProducts(context, { list: saveInfo });
+        const originProducts = getProducts(context);
+        saveProducts(context, { list: saveInfo || [], curId: originProducts?.curId || "" });
         return saveInfo;
     } catch (error) {
         console.error("获取 产品 列表失败:", error);
