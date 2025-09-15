@@ -29,15 +29,15 @@ function registerCommitHook(context) {
 
     // 定义要添加的规则，暂定为必须带有数字
     const ruleToAdd = `#!/bin/sh
-# 获取提交信息
-commit_msg=$(cat "$1")
+        # 获取提交信息
+        commit_msg=$(cat "$1")
 
-# 检查提交信息是否包含数字
-if ! echo "$commit_msg" | grep -q '[0-9]'; then
-  echo "提交信息必须包含禅道id！"
-  exit 1
-fi
-`;
+        # 检查提交信息是否包含数字
+        if ! echo "$commit_msg" | grep -q '[0-9]'; then
+        echo "提交信息必须包含禅道id！"
+        exit 1
+        fi
+    `;
 
     // 检查 commit-msg 脚本是否存在
     if (fs.existsSync(preCommitPath)) {

@@ -6,11 +6,7 @@ const { fetchRequirements, fetchBugs } = require("../zenTao/api");
 /**
  * 自动提交功能，弹出选择需求或 Bug，自动生成 commit message 并提交
  */
-async function submitCommit() {
-    // 获取需求和 Bug 列表
-    const requirements = await fetchRequirements();
-    const bugs = await fetchBugs();
-
+async function submitCommit({ commitMsg, context }) {
     // 构造可选列表
     const visualList = createVisualList(requirements, bugs);
 

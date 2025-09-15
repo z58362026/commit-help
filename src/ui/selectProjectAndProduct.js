@@ -40,6 +40,12 @@ async function getList(context) {
                         await vscode.env.clipboard.writeText(message.text);
                         vscode.window.showInformationMessage("复制成功");
                         break;
+                    case "submit":
+                        submitCommit({
+                            commitMsg: message.text,
+                            context,
+                        });
+                        break;
                     default:
                         break;
                 }
@@ -166,7 +172,7 @@ function getListHtml(projectsData, productsData) {
             .list-item:last-child {
                 border-bottom: none;
             }
-            .list .copy-btn{
+            .list .copy-btn, .submit{
                 color: blue;
                 display: inline-block;
                 margin-left: 10px;
@@ -212,9 +218,18 @@ function getListHtml(projectsData, productsData) {
         <script>
             const vscode = acquireVsCodeApi();
 
+            // 复制
             function copyText(text){
                 vscode.postMessage({
                     command: 'copyText',
+                    text: text
+                });
+            }
+
+            // 提交
+            function submit(text){
+                vscode.postMessage({
+                    command: 'submit',
                     text: text
                 });
             }
@@ -227,6 +242,11 @@ function getListHtml(projectsData, productsData) {
                         const bug = target.getAttribute('data-bug');
                         const req = target.getAttribute('data-req');
                         copyText(bug || req)
+                    }
+                    if (target.classList.contains('submit')) {
+                        const bug = target.getAttribute('data-bug');
+                        const req = target.getAttribute('data-req');
+                        submit(bug || req)
                     }
                 })
             }
@@ -278,7 +298,7 @@ function getListHtml(projectsData, productsData) {
                 
                 // 使用单引号和字符串拼接代替模板字符串，避免嵌套反引号问题
                 const itemsHtml = requirements.map(function(req) {
-                    return '<div class="list-item">' + req + '<div class="copy-btn" data-req="' + req + '">复制</div></div>';
+                    return '<div class="list-item">' + req + '<div class="copy-btn" data-req="' + req + '">复制</div><div class="submit" data-req="' + req + '">提交</div></div>';
                 }).join('');
                 listElement.innerHTML = itemsHtml;
             }
@@ -293,7 +313,7 @@ function getListHtml(projectsData, productsData) {
                 
                 // 使用单引号和字符串拼接代替模板字符串，避免嵌套反引号问题
                 const itemsHtml = bugs.map(function(bug) {
-                    return '<div class="list-item">' + bug + '<div class="copy-btn" data-bug="' + bug + '">复制</div></div>';
+                    return '<div class="list-item">' + bug + '<div class="copy-btn" data-bug="' + bug + '">复制</div><div class="submit" data-bug="' + bug + '">提交</div></div>';
                 }).join('');
                 listElement.innerHTML = itemsHtml;
             }
