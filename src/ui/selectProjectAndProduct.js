@@ -36,6 +36,10 @@ async function getList(context) {
                         const token = await ensureToken(context);
                         await handleQuery({ message, panel, token, projectsData, productsData, context });
                         break;
+                    case "copyText":
+                        await vscode.env.clipboard.writeText(message.text);
+                        vscode.window.showInformationMessage("复制成功");
+                        break;
                     default:
                         break;
                 }
@@ -207,6 +211,26 @@ function getListHtml(projectsData, productsData) {
         
         <script>
             const vscode = acquireVsCodeApi();
+
+            function copyText(text){
+                vscode.postMessage({
+                    command: 'copyText',
+                    text: text
+                });
+            }
+
+            // 复制点击事件
+            window.onload = () => {
+                document.querySelector(".list-container").addEventListener("click", function(event){
+                    const target = event.target;
+                    if (target.classList.contains('copy-btn')) {
+                        const bug = target.getAttribute('data-bug');
+                        const req = target.getAttribute('data-req');
+                        copyText(bug || req)
+                    }
+                })
+            }
+
             
             // 查询需求和Bug
             function query() {
@@ -254,7 +278,7 @@ function getListHtml(projectsData, productsData) {
                 
                 // 使用单引号和字符串拼接代替模板字符串，避免嵌套反引号问题
                 const itemsHtml = requirements.map(function(req) {
-                    return '<div class="list-item">' + req + '</div>';
+                    return '<div class="list-item">' + req + '<div class="copy-btn" data-req="' + req + '">复制</div></div>';
                 }).join('');
                 listElement.innerHTML = itemsHtml;
             }
@@ -269,7 +293,7 @@ function getListHtml(projectsData, productsData) {
                 
                 // 使用单引号和字符串拼接代替模板字符串，避免嵌套反引号问题
                 const itemsHtml = bugs.map(function(bug) {
-                    return '<div class="list-item">' + bug + '<div class="copy-btn">复制</div></div>';
+                    return '<div class="list-item">' + bug + '<div class="copy-btn" data-bug="' + bug + '">复制</div></div>';
                 }).join('');
                 listElement.innerHTML = itemsHtml;
             }
