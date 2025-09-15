@@ -2,6 +2,7 @@ const vscode = require("vscode");
 const { getProjects, saveProjects, getProducts, saveProducts } = require("../store/index");
 const { fetchProjects, fetchProducts, fetchRequirements, fetchBugs, ensureToken } = require("../zenTao/api");
 const { processRequirements, processBugs } = require("../zenTao/utils");
+const { submitCommit } = require("../features/commitSubmit");
 
 /**
  * 创建并显示项目和产品选择的 Webview 界面
