@@ -6,6 +6,7 @@ const { createVisualList } = require("./src/features/visualList");
 const { submitCommit } = require("./src/features/commitSubmit");
 const { copyToClipboard } = require("./src/features/clipboardCopy");
 const { setupAutocomplete } = require("./src/features/terminalAutocomplete");
+const { registerCommitHook } = require("./src/features/registerCommitHook");
 const { registerKeyboardShortcut } = require("./src/triggers/keyboardShortcut");
 const { createButtonTrigger } = require("./src/triggers/buttonTrigger");
 const { registerGitCommitTrigger } = require("./src/triggers/gitCommitTrigger");
@@ -15,6 +16,8 @@ const { registerGitCommitTrigger } = require("./src/triggers/gitCommitTrigger");
  * @param {vscode.ExtensionContext} context
  */
 function activate(context) {
+    // 插件激活时校验commit规则
+    registerCommitHook(context);
     // 扩展激活时输出日志
     console.log('Congratulations, your extension "commit-helper" is now active!');
     // 注册 helloWorld 命令
