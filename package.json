@@ -2,7 +2,7 @@
     "name": "commit-helper",
     "displayName": "commit-helper",
     "description": "gitlab and zentao is bridge",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "engines": {
         "vscode": "^1.102.0"
     },
@@ -66,5 +66,7 @@
     },
     "activationEvents": [
         "*"
-    ]
+    ],
+    "publisher": "wangming",
+    "repository": "https://github.com/z58362026/commit-help.git"
 }
