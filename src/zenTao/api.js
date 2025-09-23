@@ -1,7 +1,8 @@
 const axios = require("axios");
 const vscode = require("vscode");
 const { showLoginForm } = require("../ui/loginForm");
-const { getToken, saveToken, saveProducts, saveProjects, getProducts, getProjects } = require("../store");
+const { getToken, saveToken, saveProducts, saveProjects, getProducts, getProjects } = require("../store/index");
+const { buildApiUrl } = require("../store/config");
 
 // 禅道 API 地址
 const ZENTAO_API_URL = "https://rizentao.gientech.com/api.php/v1";
@@ -116,10 +117,10 @@ async function fetchRequirements(token, id) {
 async function fetchBugs(token, id) {
     if (!token) return [];
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/products/${id}/bugs?limit=9999&page=1`, {
+        const response = await axios.get(`${buildApiUrl("bugs", { id })}?limit=9999&page=1`, {
             headers: { Token: token },
         });
-        console.log("获取 Bug 列表成功:", response.data);
+        console.log("获取 Bug 列表成功:", response);
         return response.data.bugs || [];
     } catch (error) {
         console.error("获取 Bug 列表失败:", error);

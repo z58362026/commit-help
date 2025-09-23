@@ -19,14 +19,6 @@
             {
                 "command": "commit-helper.showVisualList",
                 "title": "Show ZenTao Visual List"
-            },
-            {
-                "command": "commit-helper.submitCommit",
-                "title": "Submit Commit (ZenTao)"
-            },
-            {
-                "command": "commit-helper.copyToClipboard",
-                "title": "Copy ZenTao Info to Clipboard"
             }
         ],
         "keybindings": [
@@ -44,8 +36,39 @@
                     "type": "boolean",
                     "default": true,
                     "description": "Enable Ctrl+Alt+C to trigger show visual list."
+                },
+                "commit-helper.routes": {
+                    "type": "object",
+                    "default": {
+                        "baseUrl": "https://rizentao.gientech.com/api.php/v1",
+                        "tokens": "/tokens",
+                        "user": "/user",
+                        "projects": "/projects",
+                        "products": "/products",
+                        "stories": "/projects/{id}/stories",
+                        "bugs": "/products/{id}/bugs"
+                    },
+                    "description": "ZenTao API routes configuration"
                 }
             }
+        },
+        "viewsContainers": {
+            "activitybar": [
+                {
+                    "id": "commit-helper-view-container",
+                    "title": "Commit Helper",
+                    "icon": "./src/resources/icon1.svg"
+                }
+            ]
+        },
+        "views": {
+            "commit-helper-view-container": [
+                {
+                    "type": "tree",
+                    "id": "commit-helper.visualList",
+                    "name": "ZenTao Visual List"
+                }
+            ]
         }
     },
     "scripts": {
