@@ -26,6 +26,27 @@ function activate(context) {
         createVisualList(context);
     });
 
+    // 创建一个简单的 TreeDataProvider 用于侧边栏视图
+    const treeDataProvider = {
+        getChildren: () => [
+            {
+                label: "显示 ZenTao 列表",
+                command: "commit-helper.showVisualList",
+            },
+        ],
+        getTreeItem: (element) => {
+            const treeItem = new vscode.TreeItem(element.label);
+            treeItem.command = {
+                command: element.command,
+                title: element.label,
+            };
+            return treeItem;
+        },
+    };
+
+    // 注册 TreeDataProvider
+    vscode.window.registerTreeDataProvider("commit-helper.visualList", treeDataProvider);
+
     // 将命令加入订阅，确保扩展卸载时自动清理
     context.subscriptions.push(disposable);
     context.subscriptions.push(visualListCommand);
@@ -34,7 +55,7 @@ function activate(context) {
 /**
  * 扩展卸载时调用
  */
-function deactivate() {}
+function deactivate() { }
 
 module.exports = {
     activate,
