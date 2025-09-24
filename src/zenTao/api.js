@@ -27,7 +27,7 @@ async function promptForToken(context) {
         try {
             // 这里假设禅道登录接口为 /tokens，实际请根据禅道API文档调整
             const res = await axios.post(
-                `${ZENTAO_API_URL}/tokens`,
+                `${buildApiUrl("tokens")}`,
                 {
                     account: username,
                     password: password,
@@ -80,7 +80,7 @@ async function ensureToken(context) {
 async function fetchUserInfo(token) {
     if (!token) return null;
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/user`, {
+        const response = await axios.get(`${buildApiUrl("user")}`, {
             headers: { Token: token },
         });
         console.log("获取用户信息成功:", response.data);
@@ -100,7 +100,7 @@ async function fetchUserInfo(token) {
 async function fetchRequirements(token, id) {
     if (!token) return [];
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/projects/${id}/stories?limit=9999&page=1`, {
+        const response = await axios.get(`${buildApiUrl("stories", { id })}?limit=9999&page=1`, {
             headers: { Token: token },
         });
         console.log("获取需求列表成功:", response);
@@ -140,7 +140,7 @@ async function fetchBugs(token, id) {
 async function fetchProjects({ context, token }) {
     if (!token) return [];
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/projects?limit=9999&page=1`, {
+        const response = await axios.get(`${buildApiUrl("projects")}?limit=9999&page=1`, {
             headers: { Token: token },
         });
         const projects = response.data.projects || [];
@@ -174,7 +174,7 @@ async function fetchProjects({ context, token }) {
 async function fetchProducts({ context, token }) {
     if (!token) return [];
     try {
-        const response = await axios.get(`${ZENTAO_API_URL}/products?limit=9999&page=1`, {
+        const response = await axios.get(`${buildApiUrl("products")}?limit=9999&page=1`, {
             headers: { Token: token },
         });
 
