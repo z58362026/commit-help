@@ -51,24 +51,6 @@
                     "description": "ZenTao API routes configuration"
                 }
             }
-        },
-        "viewsContainers": {
-            "activitybar": [
-                {
-                    "id": "commit-helper-view-container",
-                    "title": "Commit Helper",
-                    "icon": "./src/resources/icon1.svg"
-                }
-            ]
-        },
-        "views": {
-            "commit-helper-view-container": [
-                {
-                    "type": "tree",
-                    "id": "commit-helper.visualList",
-                    "name": "ZenTao Visual List"
-                }
-            ]
         }
     },
     "scripts": {
@@ -87,7 +69,9 @@
     "dependencies": {
         "axios": "^1.11.0"
     },
-    "activationEvents": [],
+    "activationEvents": [
+        "onStartupFinished"
+    ],
     "publisher": "wangming",
     "repository": "https://github.com/z58362026/commit-help.git"
 }
