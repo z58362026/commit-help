@@ -46,6 +46,7 @@
                         "projects": "/projects",
                         "products": "/products",
                         "stories": "/projects/{id}/stories",
+                        "tasks": "/executions/{id}/tasks",
                         "bugs": "/products/{id}/bugs"
                     },
                     "description": "ZenTao API routes configuration"

@@ -1,5 +1,5 @@
 const vscode = require("vscode");
-const { getProjects, saveProjects, getProducts, saveProducts } = require("../store/index");
+const { getProjects, saveProjects, getProducts, saveProducts, getUserInfo } = require("../store/index");
 const { fetchProjects, fetchProducts, fetchRequirements, fetchBugs, ensureToken } = require("../zenTao/api");
 const { processRequirements, processBugs } = require("../zenTao/utils");
 const { submitCommit } = require("../features/commitSubmit");
@@ -359,10 +359,17 @@ async function handleQuery({ message, panel, token, projectsData, productsData, 
         });
 
         // 并行获取需求和Bug列表
-        const [requirementsData, bugsData] = await Promise.all([
+        let [requirementsData, bugsData] = await Promise.all([
             fetchRequirements(token, projectId),
             fetchBugs(token, productId),
         ]);
+
+        const userInfo = getUserInfo(context);
+
+        bugsData = bugsData.filter((bug) => {
+            if (!bug.assignedTo || !bug.assignedTo.id) return true;
+            return bug.assignedTo.id === userInfo.id;
+        });
 
         // 格式化并更新列表
         const formattedRequirements = processRequirements(requirementsData || []);

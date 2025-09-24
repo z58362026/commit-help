@@ -4,6 +4,7 @@ const vscode = require("vscode");
 const TOKEN_KEY = "zentao_token";
 const PROJECTS_KEY = "zentao_projects";
 const PRODUCTS_KEY = "zentao_products";
+const USERINFO_KEY = "zentao_user_info";
 
 /**
  * 获取本地保存的 token（存储到工作区）
@@ -17,6 +18,25 @@ function getToken(context) {
  */
 function saveToken(context, token) {
     context.workspaceState.update(TOKEN_KEY, token);
+}
+
+/**
+ * 获取本地保存的 个人信息（存储到工作区）
+ */
+function getUserInfo(context) {
+    const str = context.workspaceState.get(USERINFO_KEY, "");
+    return str ? JSON.parse(str) : "";
+}
+
+/**
+ * 保存 个人信息 到本地（存储到工作区）
+ */
+function saveUserInfo(context, userInfo) {
+    try {
+        context.workspaceState.update(USERINFO_KEY, JSON.stringify(userInfo));
+    } catch (error) {
+        console.error("保存个人信息失败:", error);
+    }
 }
 
 /**
@@ -72,4 +92,6 @@ module.exports = {
     saveProjects,
     getProducts,
     saveProducts,
+    getUserInfo,
+    saveUserInfo,
 };

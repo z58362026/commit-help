@@ -1,7 +1,16 @@
 const axios = require("axios");
 const vscode = require("vscode");
 const { showLoginForm } = require("../ui/loginForm");
-const { getToken, saveToken, saveProducts, saveProjects, getProducts, getProjects } = require("../store/index");
+const {
+    getToken,
+    saveToken,
+    saveProducts,
+    saveProjects,
+    getProducts,
+    getProjects,
+    getUserInfo,
+    saveUserInfo,
+} = require("../store/index");
 const { buildApiUrl } = require("../store/config");
 
 // 禅道 API 地址
@@ -65,7 +74,7 @@ async function promptForToken(context) {
 async function ensureToken(context) {
     let token = getToken(context);
     // token 存在时验证其有效性
-    const validToken = await fetchUserInfo(token);
+    const validToken = await fetchUserInfo(token, context);
     if (!token || !validToken) {
         console.log("没有找到 token，弹窗登录获取...");
         token = await promptForToken(context);
@@ -77,13 +86,15 @@ async function ensureToken(context) {
 /**
  * 获取个人信息，用于校验token是否有效
  */
-async function fetchUserInfo(token) {
+async function fetchUserInfo(token, context) {
     if (!token) return null;
     try {
         const response = await axios.get(`${buildApiUrl("user")}`, {
             headers: { Token: token },
         });
         console.log("获取用户信息成功:", response.data);
+        const { account, id, realname } = response.data?.profile || {};
+        saveUserInfo(context, { account, id, realname });
         return response.data;
     } catch (error) {
         if (error.response && error.response.status === 401) {
@@ -107,6 +118,23 @@ async function fetchRequirements(token, id) {
         return response.data.stories || [];
     } catch (error) {
         console.error("获取需求列表失败:", error);
+        throw error;
+    }
+}
+
+/**
+ * 获取tasks列表
+ */
+async function fetchTasks(token, id) {
+    if (!token) return [];
+    try {
+        const response = await axios.get(`${buildApiUrl("tasks", { id })}?limit=9999&page=1`, {
+            headers: { Token: token },
+        });
+        console.log("获取任务列表成功:", response);
+        return response.data.stories || [];
+    } catch (error) {
+        console.error("获取任务列表失败:", error);
         throw error;
     }
 }
@@ -203,4 +231,5 @@ module.exports = {
     ensureToken,
     fetchProjects,
     fetchProducts,
+    fetchTasks,
 };
