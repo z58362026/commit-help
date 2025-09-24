@@ -1,8 +1,8 @@
 {
-    "name": "commit-helper",
-    "displayName": "commit-helper",
+    "name": "commit-help",
+    "displayName": "commit-help",
     "description": "gitlab and zentao is bridge",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "engines": {
         "vscode": "^1.102.0"
     },
@@ -87,7 +87,7 @@
     "dependencies": {
         "axios": "^1.11.0"
     },
-    "activationEvents": [
-        "*"
-    ]
+    "activationEvents": [],
+    "publisher": "wangming",
+    "repository": "https://github.com/z58362026/commit-help.git"
 }
