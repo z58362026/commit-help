@@ -3,6 +3,17 @@ const { getProjects, saveProjects, getProducts, saveProducts, getUserInfo } = re
 const { fetchProjects, fetchProducts, fetchRequirements, fetchBugs, ensureToken } = require("../zenTao/api");
 const { processRequirements, processBugs } = require("../zenTao/utils");
 const { submitCommit } = require("../features/commitSubmit");
+const { getCommitTemp } = require("../store/commitContent");
+
+// bug添加fix,需求添加feat
+// type: 'bug' | 'req'
+async function handleCopy({ text, type }) {
+    const temp = getCommitTemp();
+    const [id, title] = text.split(":").map((item) => item.trim());
+    type = type === "bug" ? "fix" : "feat";
+    const msg = temp.replace("{type}", type).replace("{id}", id).replace("{title}", title);
+    await vscode.env.clipboard.writeText(msg);
+}
 
 /**
  * 创建并显示项目和产品选择的 Webview 界面
@@ -38,13 +49,14 @@ async function getList(context) {
                         await handleQuery({ message, panel, token, projectsData, productsData, context });
                         break;
                     case "copyText":
-                        await vscode.env.clipboard.writeText(message.text);
+                        await handleCopy({ text: message.text, type: message.type });
                         vscode.window.showInformationMessage("复制成功");
                         break;
                     case "submit":
                         submitCommit({
                             commitMsg: message.text,
                             context,
+                            type: message.type,
                         });
                         break;
                     default:
@@ -220,18 +232,20 @@ function getListHtml(projectsData, productsData) {
             const vscode = acquireVsCodeApi();
 
             // 复制
-            function copyText(text){
+            function copyText(text, type){
                 vscode.postMessage({
                     command: 'copyText',
-                    text: text
+                    text: text,
+                    type: type
                 });
             }
 
             // 提交
-            function submit(text){
+            function submit(text, type){
                 vscode.postMessage({
                     command: 'submit',
-                    text: text
+                    text: text,
+                    type: type
                 });
             }
 
@@ -242,12 +256,12 @@ function getListHtml(projectsData, productsData) {
                     if (target.classList.contains('copy-btn')) {
                         const bug = target.getAttribute('data-bug');
                         const req = target.getAttribute('data-req');
-                        copyText(bug || req)
+                        bug.length ? copyText(bug, 'bug') : copyText(req, 'req');
                     }
                     if (target.classList.contains('submit')) {
                         const bug = target.getAttribute('data-bug');
                         const req = target.getAttribute('data-req');
-                        submit(bug || req)
+                        bug.length ? submit(bug, 'bug') : submit(req, 'req');
                     }
                 })
             }
@@ -364,12 +378,12 @@ async function handleQuery({ message, panel, token, projectsData, productsData, 
             fetchBugs(token, productId),
         ]);
 
-        const userInfo = getUserInfo(context);
+        // const userInfo = getUserInfo(context);
 
-        bugsData = bugsData.filter((bug) => {
-            if (!bug.assignedTo || !bug.assignedTo.id) return true;
-            return bug.assignedTo.id === userInfo.id;
-        });
+        // bugsData = bugsData.filter((bug) => {
+        //     if (!bug.assignedTo || !bug.assignedTo.id) return true;
+        //     return bug.assignedTo.id === userInfo.id;
+        // });
 
         // 格式化并更新列表
         const formattedRequirements = processRequirements(requirementsData || []);

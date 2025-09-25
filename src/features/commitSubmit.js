@@ -1,6 +1,7 @@
 // filepath: /commit-helper/commit-helper/src/features/commitSubmit.js
 const vscode = require("vscode");
 const { exec } = require("child_process");
+const { getCommitTemp } = require("../store/commitContent");
 
 /**
  * 自动提交功能，根据暂存区和工作区状态执行不同操作
@@ -8,7 +9,12 @@ const { exec } = require("child_process");
  * @param {string} params.commitMsg - 提交信息
  * @param {vscode.ExtensionContext} params.context - 扩展上下文
  */
-async function submitCommit({ commitMsg, context }) {
+async function submitCommit({ commitMsg, context, type }) {
+    const temp = getCommitTemp();
+    const [id, title] = commitMsg.split(":").map((item) => item.trim());
+    type = type === "bug" ? "fix" : "feat";
+    commitMsg = temp.replace("{type}", type).replace("{id}", id).replace("{title}", title);
+
     try {
         // 获取当前工作区根路径
         const workspaceRoot = vscode.workspace.rootPath;

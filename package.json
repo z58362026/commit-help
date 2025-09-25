@@ -50,6 +50,11 @@
                         "bugs": "/products/{id}/bugs"
                     },
                     "description": "ZenTao API routes configuration"
+                },
+                "commit-helper.commitContent": {
+                    "type": "string",
+                    "default": "{type}: {id}-{title}",
+                    "description": "默认的提交类型和内容模板，支持的变量有 {type}、{id}、{title}，例如:feat: 1234-新增了一个功能"
                 }
             }
         }

@@ -1,4 +1,4 @@
-const { fetchRequirements, fetchBugs } = require("../zenTao/api");
+const vscode = require("vscode");
 
 /**
  * 格式化需求
@@ -28,9 +28,18 @@ function processBugs(bugs) {
     return bugs.map(formatBug);
 }
 
+/**
+ * 获取扩展配置
+ * @returns {Object} 扩展配置对象
+ */
+function getExtensionConfig() {
+    return vscode.workspace.getConfiguration("commit-helper");
+}
+
 module.exports = {
     formatRequirement,
     formatBug,
     processRequirements,
     processBugs,
+    getExtensionConfig,
 };

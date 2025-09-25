@@ -1,12 +1,5 @@
 const vscode = require("vscode");
-
-/**
- * 获取扩展配置
- * @returns {Object} 扩展配置对象
- */
-function getExtensionConfig() {
-    return vscode.workspace.getConfiguration("commit-helper");
-}
+const { getExtensionConfig } = require("../zenTao/utils");
 
 /**
  * 获取指定路由的配置
