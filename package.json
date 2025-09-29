@@ -1,8 +1,8 @@
 {
     "name": "commit-help",
-    "displayName": "commit-help",
+    "displayName": "zentao-commit-help",
     "description": "gitlab and zentao is bridge",
-    "version": "1.0.1",
+    "version": "1.0.4",
     "engines": {
         "vscode": "^1.102.0"
     },
