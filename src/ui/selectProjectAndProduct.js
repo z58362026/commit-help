@@ -309,12 +309,12 @@ function getListHtml(projectsData, productsData) {
                 if (target.classList.contains('copy-btn')) {
                     const bug = target.getAttribute('data-bug');
                     const req = target.getAttribute('data-req');
-                    bug.length ? copyText(bug, 'bug') : copyText(req, 'req');
+                    bug?.length ? copyText(bug, 'bug') : copyText(req, 'req');
                 }
                 if (target.classList.contains('submit')) {
                     const bug = target.getAttribute('data-bug');
                     const req = target.getAttribute('data-req');
-                    bug.length ? submit(bug, 'bug') : submit(req, 'req');
+                    bug?.length ? submit(bug, 'bug') : submit(req, 'req');
                 }
             })
         }
