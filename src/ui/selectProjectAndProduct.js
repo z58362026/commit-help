@@ -4,17 +4,36 @@ const { fetchProjects, fetchProducts, fetchRequirements, fetchBugs, ensureToken 
 const { processRequirements, processBugs } = require("../zenTao/utils");
 const { submitCommit } = require("../features/commitSubmit");
 const { getCommitTemp } = require("../store/commitContent");
-const { bitchCommit } = require("../features/bitchCommit");
-const { bitchCopy } = require("../features/bitchCopy");
 
-// bug添加fix,需求添加feat
-// type: 'bug' | 'req'
-async function handleCopy({ text, type }) {
+// 计算提交的commit信息
+function handleSubmitMsg({ text, type, context }) {
     const temp = getCommitTemp();
     const [id, title] = text.split(":").map((item) => item.trim());
     type = type === "bug" ? "fix" : "feat";
-    const msg = temp.replace("{type}", type).replace("{id}", id).replace("{title}", title);
-    await vscode.env.clipboard.writeText(msg);
+    const commitMsg = temp.replace("{type}", type).replace("{id}", id).replace("{title}", title);
+    return commitMsg;
+}
+
+// 计算批量提交的msg信息，使用逗号分隔
+function handleBitchCommit(data) {
+    console.log(data);
+    if (!data || data.length === 0) {
+        return "";
+    }
+
+    data = data.map((item) => {
+        return { id: item.id, title: item.title, type: item.type === "req" ? "feat" : item.type };
+    });
+
+    const msg = data.reduce((totalMsg, item) => {
+        const { id, title, type } = item;
+        const temp = getCommitTemp();
+        const curMsg = temp.replace("{type}", type).replace("{id}", id).replace("{title}", title);
+        totalMsg = totalMsg ? `${totalMsg},${curMsg}` : curMsg;
+        return totalMsg;
+    }, "");
+
+    return msg;
 }
 
 /**
@@ -45,27 +64,35 @@ async function getList(context) {
         // 监听 Webview 消息
         panel.webview.onDidReceiveMessage(
             async (message) => {
+                let msg = "";
                 switch (message.command) {
                     case "query":
                         const token = await ensureToken(context);
                         await handleQuery({ message, panel, token, projectsData, productsData, context });
                         break;
                     case "copyText":
-                        await handleCopy({ text: message.text, type: message.type });
+                        msg = handleSubmitMsg({ text: message.text, type: message.type, context });
+                        await vscode.env.clipboard.writeText(msg);
                         vscode.window.showInformationMessage("复制成功");
                         break;
                     case "submit":
+                        msg = handleSubmitMsg({ text: message.text, type: message.type });
                         submitCommit({
-                            commitMsg: message.text,
+                            commitMsg: msg,
                             context,
-                            type: message.type,
                         });
                         break;
                     case "bitchCommit":
-                        bitchCommit(message.data);
+                        msg = handleBitchCommit(message.data);
+                        submitCommit({
+                            commitMsg: msg,
+                            context,
+                        });
                         break;
                     case "bitchCopy":
-                        bitchCopy(message.data);
+                        msg = handleBitchCommit(message.data);
+                        await vscode.env.clipboard.writeText(msg);
+                        vscode.window.showInformationMessage("批量复制成功");
                         break;
                     default:
                         break;
@@ -239,7 +266,7 @@ function getListHtml(projectsData, productsData) {
         <div class="button-group">
             <button id="queryBtn" onclick="query()">查询需求和Bug</button>
             <button id="bitchCopy" onclick="handleBitchCopy()">批量复制</button>
-            <button id="bitchCommit" onclick="handleBitchCommit">批量提交</button>
+            <button id="bitchCommit" onclick="handleBitchCommit()">批量提交</button>
         </div>
 
         <div class="list-container">
