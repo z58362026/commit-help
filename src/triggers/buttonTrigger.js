@@ -6,7 +6,7 @@ const vscode = require("vscode");
 function createButtonTrigger(context) {
     // 创建状态栏按钮
     const button = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Right, 10);
-    button.text = "$(git-commit) ZenTao";
+    button.text = "$(git-commit) Show ZenTao List";
     button.tooltip = "显示 ZenTao 提交列表";
     button.command = "commit-helper.showVisualList";
     // 使用setTimeout稍微延迟显示，确保VS Code UI已经准备好

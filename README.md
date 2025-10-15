@@ -7,9 +7,9 @@ commit-helper 是一个 VS Code 插件，帮助开发者高效对接禅道需求
 -   **禅道需求和 Bug 可视化列表**  
     支持二级列表展示项目需求和 Bug，便于快速区分和操作。
 -   **一键复制编号和描述**  
-    选中需求或 Bug 可直接复制到剪切板。
+    选中需求或 Bug 可直接复制到剪切板，支持批量操作。
 -   **自动补全到终端**  
-    在终端输入时自动补全需求或 Bug 信息。
+    在终端输入时自动补全需求或 Bug 信息，支持批量操作。
 -   **全自动/半自动 commit 提交**  
     可一键生成并提交 git commit，也可手动复制信息到 commit。
 -   **多种触发方式**  
@@ -34,6 +34,28 @@ commit-helper 是一个 VS Code 插件，帮助开发者高效对接禅道需求
 
 -   `commit-helper.enableHelloShortcut`：是否启用 helloWorld 快捷键
 -   其它自定义配置项可在 `package.json` 的 `contributes.configuration` 中扩展
+### 配置项commit-helper.routes
+```
+  "commit-helper.routes": {
+  
+    "baseUrl": "xxxxxxxxxx",
+    "tokens": "/tokens",
+    "user": "/user",
+    "projects": "/projects",
+    "products": "/products",
+    <!-- 根据产品id获取需求列表 -->
+    "stories": "/projects/{id}/stories",
+    "tasks": "/executions/{id}/tasks",
+    <!-- 根据项目id获取bug列表 -->
+    "bugs": "/products/{id}/bugs"
+  },
+```
+### 配置项commit-helper.commitContent
+复制或提交的message，下面举例说明
+```
+"commit-helper.commitContent": "{type}: {id}-{title}"
+```
+支持的变量有 {type}、{id}、{title}，例如:feat: 1234-新增了一个功能
 
 ## 依赖环境
 
