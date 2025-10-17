@@ -6,7 +6,7 @@ const { submitCommit } = require("../features/commitSubmit");
 const { getCommitTemp } = require("../store/commitContent");
 
 // 计算提交的commit信息
-function handleSubmitMsg({ text, type, context }) {
+function handleSubmitMsg({ text, type }) {
     const temp = getCommitTemp();
     const [id, title] = text.split(":").map((item) => item.trim());
     type = type === "bug" ? "fix" : "feat";
@@ -71,7 +71,7 @@ async function getList(context) {
                         await handleQuery({ message, panel, token, projectsData, productsData, context });
                         break;
                     case "copyText":
-                        msg = handleSubmitMsg({ text: message.text, type: message.type, context });
+                        msg = handleSubmitMsg({ text: message.text, type: message.type });
                         await vscode.env.clipboard.writeText(msg);
                         vscode.window.showInformationMessage("复制成功");
                         break;
@@ -339,9 +339,9 @@ function getListHtml(projectsData, productsData) {
                     bug?.length ? copyText(bug, 'bug') : copyText(req, 'req');
                 }
                 if (target.classList.contains('submit')) {
-                    const bug = target.getAttribute('data-bug');
-                    const req = target.getAttribute('data-req');
-                    bug?.length ? submit(bug, 'bug') : submit(req, 'req');
+                    const submitBug = target.getAttribute('data-bug');
+                    const submitReq = target.getAttribute('data-req');
+                    submitBug?.length ? submit(submitBug, 'bug') : submit(submitReq, 'req');
                 }
             })
         }
@@ -413,7 +413,7 @@ function getListHtml(projectsData, productsData) {
                 return '<div class="list-item">' +
                     '<input type="checkbox" class="list-item-checkbox" data-item="' + bug + '" data-type="bug" />' +
                     bug +
-                    '<div class="copy-btn" data-bug="' + bug + '">复制</div><div class="submit" data - bug="' + bug + '" > 提交</div></div > ';
+                    '<div class="copy-btn" data-bug="' + bug + '">复制</div><div class="submit" data-bug="' + bug + '" > 提交</div></div > ';
             }).join('');
             listElement.innerHTML = itemsHtml;
         }
