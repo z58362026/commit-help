@@ -10,8 +10,12 @@ const {
     getProjects,
     getUserInfo,
     saveUserInfo,
+    saveLoginInfo,
+    getLoginInfo,
 } = require("../store/index");
 const { buildApiUrl } = require("../store/config");
+const { createVisualList } = require("../features/visualList");
+const { ERROE_PASSWORD_ARR } = require("../const/index");
 
 // 禅道 API 地址
 const ZENTAO_API_URL = "https://rizentao.gientech.com/api.php/v1";
@@ -20,51 +24,68 @@ const ZENTAO_API_URL = "https://rizentao.gientech.com/api.php/v1";
  * 弹窗让用户输入账号和密码，并获取 token
  */
 async function promptForToken(context) {
-    // 禅道账号密码，工号/默认密码 Password@123
-    console.log("开始收集用户信息...");
-
     try {
-        // 使用新的登录表单代替单独的输入框
-        const credentials = await showLoginForm(context);
-        if (!credentials || !credentials.username || !credentials.password) {
-            console.log("用户取消登录或未输入完整凭证");
-            return "";
-        }
-
-        const { username, password } = credentials;
-
-        try {
-            // 这里假设禅道登录接口为 /tokens，实际请根据禅道API文档调整
-            const res = await axios.post(
-                `${buildApiUrl("tokens")}`,
-                {
-                    account: username,
-                    password: password,
-                },
-                {
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                }
-            );
-            const token = res.data && res.data.token;
-            if (token) {
-                saveToken(context, token);
-                vscode.window.showInformationMessage("禅道登录成功，token 已保存。");
-                return token;
-            } else {
-                vscode.window.showErrorMessage("登录失败，未获取到 token。");
+        let LoginParams = {};
+        const loginInfo = getLoginInfo(context);
+        if (loginInfo) {
+            LoginParams = loginInfo;
+        } else {
+            // 禅道账号密码，工号/默认密码 Password@123
+            console.log("开始收集用户信息...");
+            const credentials = await showLoginForm(context);
+            if (!credentials || !credentials.username || !credentials.password) {
+                console.log("用户取消登录或未输入完整凭证");
                 return "";
             }
-        } catch (err) {
-            console.error("禅道登录请求失败:", err);
-            vscode.window.showErrorMessage("禅道登录失败: " + err.message);
+            LoginParams = credentials;
+        }
+
+        // 这里假设禅道登录接口为 /tokens，实际请根据禅道API文档调整
+        const res = await login(LoginParams, context);
+        const token = res.data && res.data.token;
+        if (token) {
+            saveToken(context, token);
+            saveLoginInfo(LoginParams);
+            vscode.window.showInformationMessage("禅道登录成功，token 已保存。");
+            return token;
+        } else {
+            debugger;
+            vscode.window.showErrorMessage("登录失败，未获取到 token。");
             return "";
         }
     } catch (error) {
         console.error("显示登录表单时发生错误:", error);
         vscode.window.showErrorMessage("登录表单加载失败: " + error.message);
         return "";
+    }
+}
+
+// 根据账号密码获取token
+async function login(params, context) {
+    try {
+        const { username, password } = params;
+        const res = await axios.post(
+            `${buildApiUrl("tokens")}`,
+            {
+                account: username,
+                password: password,
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+        console.log(res);
+        return res;
+    } catch (e) {
+        if (ERROE_PASSWORD_ARR.includes(e?.response?.data?.error)) {
+            // 工作区储存的账号密码错误，清空，从头执行命令
+            saveLoginInfo(context, "");
+            createVisualList(context);
+        } else {
+            vscode.window.showErrorMessage("禅道登录失败: " + e);
+        }
     }
 }
 
