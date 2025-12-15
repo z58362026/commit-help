@@ -142,14 +142,14 @@ async function fetchTasks(token, id) {
 /**
  * 获取 Bug 列表
  */
-async function fetchBugs(token, id) {
+async function fetchBugs(token, id, userAccount) {
     if (!token) return [];
     try {
         const response = await axios.get(`${buildApiUrl("bugs", { id })}?limit=9999&page=1`, {
             headers: { Token: token },
         });
         console.log("获取 Bug 列表成功:", response);
-        return response.data.bugs || [];
+        return response.data.bugs.filter(item => item.status !== "closed" && item.assignedTo.account === userAccount) || [];
     } catch (error) {
         console.error("获取 Bug 列表失败:", error);
         throw error;

@@ -457,14 +457,14 @@ async function handleQuery({ message, panel, token, projectsData, productsData, 
             command: "updateBugs",
             data: ["加载中..."],
         });
-
+        const userInfo = getUserInfo(context);
         // 并行获取需求和Bug列表
         let [requirementsData, bugsData] = await Promise.all([
             fetchRequirements(token, projectId),
-            fetchBugs(token, productId),
+            fetchBugs(token, productId, userInfo.account),
         ]);
 
-        // const userInfo = getUserInfo(context);
+
 
         // bugsData = bugsData.filter((bug) => {
         //     if (!bug.assignedTo || !bug.assignedTo.id) return true;
