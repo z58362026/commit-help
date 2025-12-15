@@ -5,6 +5,28 @@ const TOKEN_KEY = "zentao_token";
 const PROJECTS_KEY = "zentao_projects";
 const PRODUCTS_KEY = "zentao_products";
 const USERINFO_KEY = "zentao_user_info";
+// 存储登录的账号密码
+const LOGIN_INFO_KEY = "zentao_login_info";
+
+/**
+ * 获取本地保存的账号密码
+ */
+function getLoginInfo(context) {
+    const str = context.workspaceState.get(LOGIN_INFO_KEY, "");
+    return str ? JSON.parse(str) : "";
+}
+
+/**
+ * 保存账号密码到本地（存储到工作区）
+ */
+function saveLoginInfo(context, loginInfo) {
+    try {
+        saveInfo = loginInfo ? JSON.stringify(loginInfo) : loginInfo;
+        context.workspaceState.update(LOGIN_INFO_KEY, saveInfo);
+    } catch (error) {
+        console.error("保存账号密码失败:", error);
+    }
+}
 
 /**
  * 获取本地保存的 token（存储到工作区）
@@ -94,4 +116,6 @@ module.exports = {
     saveProducts,
     getUserInfo,
     saveUserInfo,
+    saveLoginInfo,
+    getLoginInfo,
 };
